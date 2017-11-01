@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ShoppingList3Activity extends AppCompatActivity {
-    private static final String FILENAME="shopping_list.txt";
+    private static final String FILENAME="shopping_list.txt"; //constant
     private static final int MAX_BYTES = 8000;
 
     private ArrayList<ShoppingItem> itemList;
@@ -38,19 +38,19 @@ public class ShoppingList3Activity extends AppCompatActivity {
 
     private void writeItemList() {
         try {
-            FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-            for (int i = 0; i < itemList.size(); i++) {
-                ShoppingItem it = itemList.get(i);
-                String line = String.format("%s;%b\n", it.getText(), it.isChecked());
-                fos.write(line.getBytes());
+            FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);//obre un fitxer, li posemun try and catch per capturar l'error
+            for (int i = 0; i < itemList.size(); i++) { //passem per tots els items
+                ShoppingItem it = itemList.get(i);// afagem l'item
+                String line = String.format("%s;%b\n", it.getText(), it.isChecked()); //capturem un string i un boolea
+                fos.write(line.getBytes()); //ALT+ENTER per fer un altre catch
                 }
-                fos.close();
+                fos.close(); //tanquem fitxer
         } catch (FileNotFoundException e) {
-            Log.e("marc", "writeItemList: FileNotFoundException");
-            Toast.makeText(this, R.string.cannot_write ,Toast.LENGTH_SHORT).show();
+            Log.e("marc", "writeItemList: FileNotFoundException");//mostrar un error
+            Toast.makeText(this, R.string.cannot_write ,Toast.LENGTH_SHORT).show(); //creem un toast amb un text traduilble
 
         } catch (IOException e) {
-            Log.e("marc", "writeItemList: IOException");
+            Log.e("marc", "writeItemList: IOException"); //erro en entrada/sortida per escriure al fitxer
             Toast.makeText(this, R.string.cannot_write ,Toast.LENGTH_SHORT).show();
 
         }
@@ -60,15 +60,16 @@ public class ShoppingList3Activity extends AppCompatActivity {
     private void readItemList (){
         itemList=new ArrayList<>();
         try {
-            FileInputStream fis = openFileInput(FILENAME);
+            FileInputStream fis = openFileInput(FILENAME);//sorrounf with try and catch
             byte [] buffer = new byte [MAX_BYTES];
-            int nread = fis.read(buffer);
-            if(nread>0){
-                String content = new String(buffer, 0, nread);
-                String [] lines = content.split("\n");
-                for (String line : lines) {
+            int nread = fis.read(buffer);// numero de bytes llegits
+            if(nread>0){ // no més per quan estigui el fitxer ple ja sino al tenir -1 peta quan fem un clear all
+                String content = new String(buffer, 0, nread); //passem el buffer a un string,el buffer comença a 0, numero de bytes que hem llegit
+                String [] lines = content.split("\n");//extraiem les linies d'aqui
+                for (String line : lines) { //passa per cada l'inia d'aquest array
                     String[] parts = line.split(";");
-                    itemList.add(new ShoppingItem(parts[0], parts[1].equals("true")));
+                    itemList.add(new ShoppingItem(parts[0], parts[1].equals("true"))); // el segon parametre es una comparacio de strings
+                    //
                 }
             }
             fis.close();
@@ -84,9 +85,9 @@ public class ShoppingList3Activity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop() { //mentre la app esta parada...
         super.onStop();
-        writeItemList();
+        writeItemList(); //guardem les dades
     }
 
     @Override
@@ -169,10 +170,10 @@ public class ShoppingList3Activity extends AppCompatActivity {
         }
         list.smoothScrollToPosition(itemList.size()-1);
     }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options, menu);
+    @Override //per que aparegui el menu
+    public boolean onCreateOptionsMenu(Menu menu) { //importem les classes
+        MenuInflater inflater = getMenuInflater();//inflador de menus
+        inflater.inflate(R.menu.options, menu); //el nostre menu es diu options
         return true;
     }
 
@@ -183,9 +184,9 @@ public class ShoppingList3Activity extends AppCompatActivity {
             case R.id.clear_checked:
                 clearChecked();
                 return true;
-            case R.id.clear_all:
+            case R.id.clear_all: //posem un nou cas per borrar tots els elemnts
                 clearAll();
-                return true;
+                return true; //sempre hem de tornar true al gestionar menus hem elimininat el case help...
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -195,7 +196,7 @@ public class ShoppingList3Activity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.confirm);
         builder.setMessage(R.string.confirm_clear_all);
-        builder.setPositiveButton(R.string.clear_all, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.clear_all, new DialogInterface.OnClickListener() { //new onClickListener...
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 itemList.clear();
@@ -203,16 +204,16 @@ public class ShoppingList3Activity extends AppCompatActivity {
             }
         });
         builder.setNegativeButton(android.R.string.cancel, null);
-        builder.create().show();
+        builder.create().show(); //que es mostri el quadre de dialeg
     }
 
-    private void clearChecked() {
+    private void clearChecked() { //borrem els que estan marcats
         int i = 0;
-        while (i < itemList.size()) {
-            if (itemList.get(i).isChecked()) {
+        while (i < itemList.size()) { //mentre no estiguis al final
+            if (itemList.get(i).isChecked()) { //si està marcat...
                 itemList.remove(i);
             } else {
-                i++;
+                i++; //no borraria el segon element perq no el mira
             }
         }
         adapter.notifyDataSetChanged();
